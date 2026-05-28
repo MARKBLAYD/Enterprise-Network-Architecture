@@ -12,22 +12,22 @@ Implemented using Cisco IOS and MikroTik RouterOS.
 ## Lab Overview
 
 ### Lab 1: HSRP, OSPF & Aggregation (Cisco)
-![Lab 1 Topology](Lab1-HSRP-OSPF-Aggregation/topology.png)
+![Lab 1 Topology](Lab1-HSRP-OSPF-Aggregation/Screnshot.png)
 Building a resilient corporate campus network. This lab focuses on gateway redundancy using HSRP, link redundancy via LACP (Port-Channels), and internal routing with OSPF.
 *   **Key Results:** Achieved automatic failover for gateways and aggregated physical links for higher bandwidth and resilience.
 
 ### Lab 2: MPLS L3VPN with VRF (MikroTik)
-![Lab 2 Topology](Lab2-MPLS-L3VPN-VRF/topology.png)
+![Lab 2 Topology](Lab2-MPLS-L3VPN-VRF/Screnshot.png)
 Implementing isolated L3 VPN services for multiple clients over a shared MPLS infrastructure.
 *   **Key Results:** Configured VRF instances with unique RDs and RTs, ensuring complete traffic isolation between Customer A and Customer B, even with overlapping IP subnets.
 
 ### Lab 3: OSPF, BGP & MPLS Integration (MikroTik)
-![Lab 3 Topology](Lab3-OSPF-BGP-MPLS/topology.png)
+![Lab 3 Topology](Lab3-OSPF-BGP-MPLS/Screnshot.png)
 Integrating interior (OSPF) and exterior (BGP) routing with MPLS transport. Features a BGP-free core and a Route Reflector for iBGP scalability.
 *   **Key Results:** Successfully exchanged VPNv4 routes across the MPLS core while keeping core routers free of BGP client routes.
 
 ### Lab 4: EVPN/VXLAN Spine-Leaf (MikroTik)
-![Lab 4 Topology](Lab4-EVPN-VXLAN-Spine-Leaf/topology.png)
+![Lab 4 Topology](Lab4-EVPN-VXLAN-Spine-Leaf/Screnshot.png)
 Building a modern Data Center network using a two-tier Spine-Leaf topology with overlay networks.
 *   **Underlay:** OSPF provides IP connectivity between Loopback interfaces.
 *   **Overlay:** BGP EVPN distributes MAC and VNI information. Spine acts as Route Reflector.
