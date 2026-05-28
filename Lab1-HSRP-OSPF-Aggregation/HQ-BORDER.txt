@@ -1,0 +1,115 @@
+enable
+configure terminal
+
+! Настройка интерфейса в сторону провайдера - ИЗМЕНИЛИ IP!
+interface gigabitEthernet 0/0
+ ip address 200.200.200.2 255.255.255.252
+ no shutdown
+ exit
+
+interface gigabitEthernet 0/1
+ no shutdown
+ exit
+
+interface gigabitEthernet 0/1.10
+ encapsulation dot1Q 10
+ ip address 10.20.10.1 255.255.255.0
+ exit
+
+interface gigabitEthernet 0/1.20
+ encapsulation dot1Q 20
+ ip address 10.20.20.1 255.255.255.0
+ exit
+
+interface gigabitEthernet 0/2
+ no shutdown
+ exit
+
+interface gigabitEthernet 0/2.10
+ encapsulation dot1Q 10
+ ip address 10.10.10.1 255.255.255.0
+ exit
+
+interface gigabitEthernet 0/2.20
+ encapsulation dot1Q 20
+ ip address 10.10.20.1 255.255.255.0
+ exit
+
+! Настройка шлюза по умолчанию в интернет - ИЗМЕНИЛИ!
+ip route 0.0.0.0 0.0.0.0 200.200.200.1
+
+end
+write memory
+enable
+configure terminal
+
+! Настройка сабинтерфейса для связи с PERM-SW-1
+interface gigabitEthernet 0/1
+ no shutdown
+ exit
+
+interface gigabitEthernet 0/1.10
+ encapsulation dot1Q 10
+ ip address 10.20.10.1 255.255.255.0
+ exit
+
+interface gigabitEthernet 0/1.20  
+ encapsulation dot1Q 20
+ ip address 10.20.20.1 255.255.255.0
+ exit
+
+end
+write memory
+enable
+configure terminal
+
+ip route 0.0.0.0 0.0.0.0 100.64.0.1
+
+interface GigabitEthernet0/0
+ ip address 100.64.0.5 255.255.255.0
+ no shutdown
+
+end
+write memory
+enable
+configure terminal
+
+interface GigabitEthernet0/0
+ ip address 100.64.0.6 255.255.255.0
+ no shutdown
+ standby 30 ip 100.64.0.5         
+ standby 30 priority 110
+ standby 30 preempt
+ip ospf cost 10
+ip ospf hello-interval 1
+ ip ospf dead-interval 3
+
+interface gigabitEthernet 0/1.55
+ encapsulation dot1Q 55
+ ip address 10.0.55.1 255.255.255.0
+no shutdown
+ip ospf cost 20
+ip ospf hello-interval 1
+ ip ospf dead-interval 3
+
+ exit
+
+router ospf 1
+ passive-interface default
+ no passive-interface GigabitEthernet0/0
+ no passive-interface GigabitEthernet0/1.55
+ default-information originate  
+network 10.0.55.0 0.0.0.255 area 0
+ network 10.10.0.0 0.0.255.255 area 0
+ network 10.20.0.0 0.0.255.255 area 0
+ network 100.64.0.0 0.0.0.255 area 0
+network 100.64.0.6 0.0.0.0 area 0
+network 10.0.55.1 0.0.0.0 area 0
+network 10.10.10.1 0.0.0.0 area 0
+network 10.10.20.1 0.0.0.0 area 0
+network 10.20.10.1 0.0.0.0 area 0
+network 10.20.20.1 0.0.0.0 area 0
+ exit
+
+end
+write memory

@@ -1,0 +1,17 @@
+enable
+configure terminal
+interface GigabitEthernet0/1
+ ip address 8.8.8.3 255.255.255.0
+ no shutdown
+ standby 20 ip 8.8.8.1         
+ standby 20 priority 100
+ standby 20 preempt
+
+interface GigabitEthernet0/2
+ ip address 100.64.0.3 255.255.255.0
+ no shutdown
+ standby 10 ip 100.64.0.1      
+ standby 10 priority 100
+ standby 10 preempt
+end
+write memory

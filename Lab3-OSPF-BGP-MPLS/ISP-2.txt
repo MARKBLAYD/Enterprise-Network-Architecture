@@ -1,0 +1,32 @@
+/system identity set name=ISP-2
+
+/interface bridge add name=lo0
+/ip address
+add address=49.0.6.4/32 interface=lo0
+add address=2.2.2.1/24 interface=lo0
+add address=4.4.4.1/24 interface=lo0
+add address=5.5.5.1/24 interface=lo0
+
+/ip address
+add address=53.11.76.6/30 interface=ether1 network=53.11.76.4    # к PE-3
+add address=53.11.76.14/30 interface=ether2 network=53.11.76.12  # к ISP-1  
+add address=53.11.76.17/30 interface=ether3 network=53.11.76.16  # к Partner-PE
+
+/routing bgp instance
+set default as=49062 router-id=49.0.6.4 redistribute-connected=yes
+
+/routing filter
+add action=accept chain=to-full prefix=2.2.2.0/24
+add action=accept chain=to-full prefix=4.4.4.0/24  
+add action=accept chain=to-full prefix=5.5.5.0/24
+add action=discard chain=to-full
+
+add action=accept chain=to-limited prefix=2.2.2.0/24
+add action=discard chain=to-limited
+
+add action=accept chain=from-bgp
+
+/routing bgp peer
+add name=to-pe3 remote-address=53.11.76.5 remote-as=65000 out-filter=to-limited in-filter=from-bgp
+add name=to-isp1 remote-address=53.11.76.13 remote-as=49061 out-filter=to-full in-filter=from-bgp
+add name=to-partner remote-address=53.11.76.18 remote-as=65001 out-filter=to-full in-filter=from-bgp

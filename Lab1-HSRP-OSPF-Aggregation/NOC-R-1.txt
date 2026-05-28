@@ -1,0 +1,42 @@
+enable
+configure terminal
+
+interface GigabitEthernet0/0
+ip address 10.0.56.1 255.255.255.0
+no shutdown
+
+interface GigabitEthernet0/1
+ ip address 100.64.0.7 255.255.255.0
+ no shutdown
+ standby 30 ip 100.64.0.5         
+ standby 30 priority 100
+ standby 30 preempt
+ip ospf cost 20
+ip ospf hello-interval 1
+ ip ospf dead-interval 3
+
+
+interface GigabitEthernet0/2
+ip address 10.0.55.2 255.255.255.0
+no shutdown
+ip ospf cost 10
+ip ospf hello-interval 1
+ ip ospf dead-interval 3
+
+ip route 0.0.0.0 255.255.255.0 100.64.0.5
+
+router ospf 1
+ passive-interface default
+ no passive-interface GigabitEthernet0/1
+ no passive-interface GigabitEthernet0/2
+ no passive-interface GigabitEthernet0/0
+network 10.0.55.0 0.0.0.255 area 0
+ network 10.0.56.0 0.0.0.255 area 0
+ network 100.64.0.0 0.0.0.255 area 0
+network 100.64.0.7 0.0.0.0 area 0
+network 10.0.55.2 0.0.0.0 area 0
+network 10.0.56.1 0.0.0.0 area 0
+ exit
+
+end
+write memory

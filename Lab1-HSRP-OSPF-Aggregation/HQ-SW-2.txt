@@ -1,0 +1,21 @@
+enable
+configure terminal
+
+vlan 20
+ name HQ_VLAN20
+exit
+
+interface fastEthernet 03
+ switchport mode access
+ switchport access vlan 20
+ no shutdown
+ exit
+
+interface gigabitEthernet 01
+ switchport mode trunk
+ switchport trunk allowed vlan 20
+ no shutdown
+ exit
+
+end
+write memory

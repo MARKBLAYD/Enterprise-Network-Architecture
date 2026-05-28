@@ -1,0 +1,57 @@
+/system identity set name=PE-3
+
+# Интерфейсы
+/interface bridge add name=lo0
+/ip address add address=10.200.0.3/32 interface=lo0
+
+/ip address
+add address=10.200.1.20/30 interface=ether1 network=10.200.1.20  # к CORE-101
+add address=10.200.1.24/30 interface=ether2 network=10.200.1.24  # к CORE-102  
+add address=53.11.76.1/30 interface=ether3 network=53.11.76.0    # к ISP-1
+add address=53.11.76.5/30 interface=ether4 network=53.11.76.4    # к ISP-2
+add address=53.11.76.9/30 interface=ether5 network=53.11.76.8    # к Partner-PE
+
+# OSPF для подключения к существующей сети
+/routing ospf instance
+set 0 router-id=10.200.0.3
+
+/routing ospf interface
+add interface=ether1
+add interface=ether2
+add interface=lo0 passive=yes
+
+/routing ospf network
+add area=backbone network=10.200.0.3/32
+add area=backbone network=10.200.1.20/30
+add area=backbone network=10.200.1.24/30
+
+# Default route в OSPF
+/routing ospf area
+set backbone default-cost=100 type=default-originate
+
+# BGP конфигурация
+/routing bgp instance
+set default as=65000 router-id=10.200.0.3
+
+# Фильтры для маршрутной политики
+/routing filter
+add action=accept chain=to-ebgp prefix=10.0.0.0/8 prefix-length=8-24
+add action=discard chain=to-ebgp
+
+add action=accept chain=from-ebgp
+add action=accept chain=to-partner
+
+add action=accept chain=from-partner
+
+# BGP пиры
+/routing bgp peer
+add name=to-isp1 remote-address=53.11.76.2 remote-as=49061 out-filter=to-ebgp in-filter=from-ebgp
+add name=to-isp2 remote-address=53.11.76.6 remote-as=49062 out-filter=to-ebgp in-filter=from-ebgp
+add name=to-partner remote-address=53.11.76.10 remote-as=65001 out-filter=to-partner in-filter=from-partner
+/routing bgp instance
+set default as=65000 router-id=10.200.0.102
+
+[admin@CORE-102] > /routing bgp peer
+add name=rr-peer-pe1 remote-address=10.200.0.1 remote-as=65000 route-reflect=yes update-source=10.200.0.102
+add name=rr-peer-pe2 remote-address=10.200.0.2 remote-as=65000 route-reflect=yes update-source=10.200.0.102
+add name=rr-peer-pe3 remote-address=10.200.0.3 remote-as=65000 route-reflect=yes update-source=10.200.0.102

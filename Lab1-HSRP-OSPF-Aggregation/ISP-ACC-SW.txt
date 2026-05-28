@@ -1,0 +1,29 @@
+enable
+configure terminal
+
+interface GigabitEthernet0/1
+ description to-ISP-PE-1
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/2
+ description to-ISP-PE-2  
+ switchport mode access
+ spanning-tree portfast
+
+interface FastEthernet0/1
+ description to-HQ-BORDER
+ switchport mode access
+ spanning-tree portfast
+
+end
+write memory
+enable
+configure terminal
+
+interface FastEthernet0/2
+ switchport mode access
+ spanning-tree portfast
+
+end
+write memory

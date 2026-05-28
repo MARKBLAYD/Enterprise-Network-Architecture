@@ -1,0 +1,31 @@
+/system identity
+set name=SPINE-101
+
+/interface bridge
+add name=lo0
+
+/ip address
+add address=10.200.0.101/32 interface=lo0
+add address=10.200.1.1/30 interface=ether1 network=10.200.1.0
+add address=10.200.1.5/30 interface=ether2 network=10.200.1.4
+
+/routing ospf instance
+add disabled=no name=default router-id=10.200.0.101
+
+/routing ospf area
+add disabled=no instance=default name=backbone
+
+/routing ospf interface-template
+add area=backbone disabled=no networks=10.200.0.0/24
+add area=backbone disabled=no networks=10.200.1.0/24
+/routing bgp instance
+add as=65000 name=default router-id=10.200.0.101
+
+/routing bgp connection
+add afi=evpn instance=default local.address=10.200.0.101 \
+    local.role=ibgp-rr multihop=yes name=to-leaf-1 \
+    remote.address=10.200.0.1 remote.as=65000
+
+add afi=evpn instance=default local.address=10.200.0.101 \
+    local.role=ibgp-rr multihop=yes name=to-leaf-2 \
+    remote.address=10.200.0.2 remote.as=65000

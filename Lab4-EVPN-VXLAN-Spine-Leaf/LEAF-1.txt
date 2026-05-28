@@ -1,0 +1,37 @@
+/routing bgp instance
+add as=65000 name=default router-id=10.200.0.101
+
+/routing bgp connection
+add afi=evpn instance=default local.address=10.200.0.101 \
+    local.role=ibgp-rr multihop=yes name=to-leaf-1 \
+    remote.address=10.200.0.1 remote.as=65000
+
+add afi=evpn instance=default local.address=10.200.0.101 \
+    local.role=ibgp-rr multihop=yes name=to-leaf-2 \
+    remote.address=10.200.0.2 remote.as=65000
+/routing bgp instance
+add as=65000 name=default router-id=10.200.0.1
+
+/routing bgp connection
+add afi=evpn instance=default local.address=10.200.0.1 \
+    local.role=ibgp multihop=yes name=to-spine-101 \
+    remote.address=10.200.0.101 remote.as=65000
+/interface bridge
+add name=NVE vlan-filtering=yes
+
+/interface vxlan
+add bridge=NVE learning=no local-address=10.200.0.1 \
+    name=vni1010_vlan10 vni=1010 bridge-pvid=10
+    
+add bridge=NVE learning=no local-address=10.200.0.1 \
+    name=vni1020_vlan20 vni=1020 bridge-pvid=20
+/routing bgp evpn
+add disabled=no instance=default name=vni1010_vlan10 vni=1010
+    
+add disabled=no instance=default name=vni1020_vlan20 vni=1020
+/interface bridge port
+add bridge=NVE frame-types=admit-only-untagged-and-priority-tagged \
+    interface=ether2 pvid=10  # VPC-11 в VLAN 10
+    
+add bridge=NVE frame-types=admit-only-untagged-and-priority-tagged \
+    interface=ether3 pvid=20  # VPC-12 в VLAN 20

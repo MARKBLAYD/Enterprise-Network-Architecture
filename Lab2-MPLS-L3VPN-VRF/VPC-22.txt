@@ -1,0 +1,4 @@
+/ip address
+add address=20.0.0.16/24 interface=ether1
+/ip route
+add gateway=20.0.0.1

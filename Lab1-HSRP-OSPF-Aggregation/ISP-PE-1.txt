@@ -1,0 +1,41 @@
+enable
+configure terminal
+
+! Настройка интерфейса в сторону интернета (к 8.8.8.8)
+interface gigabitEthernet 0/1
+ ip address 8.8.8.1 255.255.255.0
+ no shutdown
+ exit
+
+! Настройка интерфейса в сторону клиента (HQ-BORDER)!
+interface gigabitEthernet 0/0
+ ip address 200.200.200.1 255.255.255.252
+ no shutdown
+ exit
+
+! Настройка статического маршрута "в интернет"
+ip route 0.0.0.0 0.0.0.0 8.8.8.8
+
+! Настройка маршрута до сетей клиента
+ip route 10.10.0.0 255.255.0.0 200.200.200.2
+ip route 10.20.0.0 255.255.0.0 200.200.200.2
+
+end
+write memory
+enable
+configure terminal
+interface GigabitEthernet0/1
+ ip address 100.64.0.2 255.255.255.0
+ no shutdown
+ standby 10 ip 100.64.0.1      
+ standby 10 priority 110
+ standby 10 preempt
+
+interface GigabitEthernet0/2
+ ip address 8.8.8.2 255.255.255.0
+ no shutdown
+ standby 20 ip 8.8.8.1         
+ standby 20 priority 110	
+ standby 20 preempt
+end
+write memory

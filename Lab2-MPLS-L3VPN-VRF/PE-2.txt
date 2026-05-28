@@ -1,0 +1,58 @@
+/system identity
+set name=PE-2
+
+/interface bridge
+add name=lo0
+
+/ip address
+add address=10.200.0.2/32 interface=lo0
+add address=10.200.1.2/30 interface=ether1 network=10.200.1.0
+
+/routing ospf instance
+add disabled=no name=default router-id=10.200.0.2
+
+/routing ospf area
+add disabled=no instance=default name=backbone
+
+/routing ospf interface-template
+add area=backbone disabled=no networks=10.200.0.0/24
+add area=backbone disabled=no networks=10.200.1.0/24
+/mpls ldp
+set enabled=yes lsr-id=10.200.0.2
+
+/mpls ldp interface
+add interface=ether1
+/ip vrf
+add name=VRF-CUST-A interfaces=ether2
+add name=VRF-CUST-B interfaces=ether3
+
+/ip address
+add address=10.0.0.1/24 interface=ether2 network=10.0.0.0
+add address=20.0.0.1/24 interface=ether3 network=20.0.0.0
+/routing bgp instance
+add as=65000 name=default router-id=10.200.0.2
+
+/routing bgp connection
+add afi=vpnv4 instance=default \
+    local.address=10.200.0.2 local.role=ibgp \
+    multihop=yes name=to-PE-1 \
+    remote.address=10.200.0.1 remote.as=65000
+# Customer A
+/routing bgp vpn
+add vrf=VRF-CUST-A \
+    route-distinguisher=10.200.0.2:100 \
+    import.route-targets=65000:100 \
+    export.route-targets=65000:100 \
+    export.redistribute=connected \
+    label-allocation-policy=per-vrf \
+    instance=default
+
+# Customer B
+/routing bgp vpn
+add vrf=VRF-CUST-B \
+    route-distinguisher=10.200.0.2:200 \
+    import.route-targets=65000:200 \
+    export.route-targets=65000:200 \
+    export.redistribute=connected \
+    label-allocation-policy=per-vrf \
+    instance=default

@@ -1,0 +1,47 @@
+/system identity set name=PE-2
+
+/interface bridge add name=lo0
+/ip address add address=10.200.0.2/32 interface=lo0
+
+/ip address
+add address=10.0.2.1/24 interface=ether1 network=10.0.2.0    # к VPC-2
+add address=10.200.1.14/30 interface=ether2 network=10.200.1.12   # к CORE-101
+add address=10.200.1.18/30 interface=ether3 network=10.200.1.16   # к CORE-102
+
+/routing ospf instance
+set 0 router-id=10.200.0.2
+
+/routing ospf interface
+add interface=ether1 passive=yes    # клиентская сеть
+add interface=ether2
+add interface=ether3
+add interface=lo0 passive=yes
+
+/routing ospf network
+add area=backbone network=10.200.0.2/32
+add area=backbone network=10.200.1.12/30
+add area=backbone network=10.200.1.16/30
+add area=backbone network=10.0.2.0/24
+/interface vpls
+add name=vpls-customer-l2vpn-1 vpls-id=101 disabled=no
+add name=vpls-customer-l2vpn-2 vpls-id=102 disabled=no
+
+/interface bridge
+add name=bridge-vpls-101
+add name=bridge-vpls-102
+
+/interface bridge port
+add bridge=bridge-vpls-101 interface=ether1    # VPC-2
+add bridge=bridge-vpls-101 interface=vpls-customer-l2vpn-1
+
+add bridge=bridge-vpls-102 interface=ether4    # VPC-4 (новый интерфейс)
+add bridge=bridge-vpls-102 interface=vpls-customer-l2vpn-2
+
+/mpls ldp
+set enabled=yes
+add interface=ether2    # к CORE-101
+add interface=ether3    # к CORE-102
+
+/mpls ldp interface
+add interface=ether2
+add interface=ether3

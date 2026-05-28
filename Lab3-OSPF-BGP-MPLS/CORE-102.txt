@@ -1,0 +1,35 @@
+/system identity set name=CORE-102
+
+/interface bridge add name=lo0
+/ip address add address=10.200.0.102/32 interface=lo0
+
+/ip address
+add address=10.200.1.6/30 interface=ether1 network=10.200.1.4    # к PE-1
+add address=10.200.1.10/30 interface=ether2 network=10.200.1.8   # к CORE-101
+add address=10.200.1.17/30 interface=ether3 network=10.200.1.16  # к PE-2
+
+/routing ospf instance
+set 0 router-id=10.200.0.102
+
+/routing ospf interface
+add interface=ether1
+add interface=ether2
+add interface=ether3
+add interface=lo0 passive=yes
+
+/routing ospf network
+add area=backbone network=10.200.0.102/32
+add area=backbone network=10.200.1.4/30
+add area=backbone network=10.200.1.8/30
+add area=backbone network=10.200.1.16/30
+/ip address add address=10.200.1.25/30 interface=ether4 network=10.200.1.24
+/routing ospf interface add interface=ether4
+/routing ospf network add area=backbone network=10.200.1.24/30
+/mpls ldp
+set enabled=yes
+
+/mpls ldp interface
+add interface=ether1    # к PE-1
+add interface=ether2    # к CORE-102  
+add interface=ether3    # к PE-2
+add interface=ether4    # к PE-3

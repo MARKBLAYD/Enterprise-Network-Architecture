@@ -1,0 +1,89 @@
+configure terminal
+
+vlan 10
+ name VLAN10
+exit
+vlan 20
+ name VLAN20
+exit
+
+interface range gigabitEthernet 0/1-2
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+ no shutdown
+ exit
+
+interface port-channel 1
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+ exit
+
+interface range gigabitEthernet 0/1-2
+ channel-group 1 mode desirable
+ exit
+
+interface range fastEthernet 0/5-6
+ switchport mode access
+ switchport access vlan 20
+ no shutdown
+exit
+
+end
+write memory
+
+enable
+configure terminal
+
+interface range fastEthernet 0/10-11
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+ no shutdown
+ exit
+
+interface port-channel 2
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+ exit
+
+interface range fastEthernet 0/10-11
+ channel-group 2 mode desirable
+ exit
+
+end
+write memory
+enable
+configure terminal
+
+interface range fastEthernet 0/5-6
+ switchport mode access
+ switchport access vlan 20
+ no shutdown
+ exit
+
+end
+write memory
+enable
+configure terminal
+
+vlan 55
+name vlan55
+exit
+
+interface range gigabitEthernet 0/1-2
+switchport trunk allowed vlan add 55
+exit
+
+interface port-channel 1
+switchport trunk allowed vlan add 55
+exit
+
+interface range fastEthernet 0/10-11
+switchport trunk allowed vlan add 55
+exit
+
+interface port-channel 2
+switchport trunk allowed vlan add 55
+exit
+
+end
+write memory
